@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexSky | Premium Weather Forecast</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Get real-time weather details and forecasts. Search globally with instant autocomplete, explore detailed UV, humidity, and wind indexes, and track favorite cities with glassmorphic visuals.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="weather-clear-day">
+  <!-- Weather particle canvas overlay in background -->
+  <canvas id="weather-particle-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <i data-lucide="cloud-sun"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Apex<span>Sky</span></h1>
+          <p>Precision Meteorological Data</p>
+        </div>
+      </div>
+      
+      <!-- Search and Location Controls -->
+      <div class="search-section">
+        <div class="search-box-wrapper">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="city-search" placeholder="Search city..." autocomplete="off">
+          <ul class="autocomplete-list hidden" id="autocomplete-list">
+            <!-- Autocomplete suggestions populated here -->
+          </ul>
+        </div>
+        <button id="location-btn" class="btn-icon" title="Use current location" aria-label="Use Current Location">
+          <i data-lucide="map-pin"></i>
+        </button>
+      </div>
+
+      <!-- Settings -->
+      <div class="header-actions">
+        <!-- Metric Toggle: Celsius / Fahrenheit -->
+        <div class="unit-toggle-wrapper">
+          <span class="unit-label active" id="unit-c">°C</span>
+          <button id="unit-toggle-btn" class="unit-toggle-pill" aria-label="Toggle Units">
+            <span class="unit-toggle-ball"></span>
+          </button>
+          <span class="unit-label" id="unit-f">°F</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN APP CONTENT -->
+    <main class="app-content">
+      
+      <!-- Left / Main Panel -->
+      <section class="main-panel">
+        
+        <!-- Current Weather Card -->
+        <div class="card glass-card current-weather-card">
+          <div class="card-header-weather">
+            <div class="location-details">
+              <div class="city-title-row">
+                <h2 id="city-name">Loading weather...</h2>
+                <button id="favorite-btn" class="btn-star" title="Star City" aria-label="Favorite city">
+                  <i data-lucide="star"></i>
+                </button>
+              </div>
+              <p id="weather-date">-</p>
+            </div>
+            <div class="rate-status" id="weather-status-tag">
+              <span class="status-pulse"></span>
+              <span id="update-time">Locating...</span>
+            </div>
+          </div>
+          
+          <div class="current-weather-body">
+            <div class="temp-hero">
+              <span class="temp-val" id="current-temp">-</span>
+              <span class="temp-deg" id="current-unit">°</span>
+            </div>
+            
+            <div class="weather-summary-block">
+              <div class="hero-weather-icon" id="hero-weather-icon">
+                <!-- Large weather icon svg / img -->
+                <i data-lucide="sun"></i>
+              </div>
+              <div class="weather-text-desc">
+                <h3 id="weather-desc-text">Clear Sky</h3>
+                <p id="temp-range">H: -° L: -°</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Metrics Panel (Apparent Temp, Humidity, Wind Speed, UV Index) -->
+        <div class="metrics-grid">
+          <!-- Feels Like -->
+          <div class="card glass-card metric-item-card">
+            <div class="metric-icon feels-like">
+              <i data-lucide="thermometer"></i>
+            </div>
+            <div class="metric-details">
+              <span class="metric-title">Feels Like</span>
+              <span class="metric-value" id="val-feels-like">-</span>
+            </div>
+          </div>
+
+          <!-- Humidity -->
+          <div class="card glass-card metric-item-card">
+            <div class="metric-icon humidity">
+              <i data-lucide="droplets"></i>
+            </div>
+            <div class="metric-details">
+              <span class="metric-title">Humidity</span>
+              <span class="metric-value" id="val-humidity">-</span>
+            </div>
+          </div>
+
+          <!-- Wind Speed -->
+          <div class="card glass-card metric-item-card">
+            <div class="metric-icon wind">
+              <i data-lucide="wind"></i>
+            </div>
+            <div class="metric-details">
+              <span class="metric-title">Wind Speed</span>
+              <span class="metric-value" id="val-wind">-</span>
+            </div>
+          </div>
+
+          <!-- UV Index -->
+          <div class="card glass-card metric-item-card">
+            <div class="metric-icon uv">
+              <i data-lucide="sun-dim"></i>
+            </div>
+            <div class="metric-details">
+              <span class="metric-title">UV Index</span>
+              <span class="metric-value" id="val-uv">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 24-Hour Forecast Timeline -->
+        <div class="card glass-card hourly-forecast-card">
+          <div class="card-header">
+            <h3><i data-lucide="clock"></i> 24-Hour Forecast</h3>
+          </div>
+          <div class="card-body-hourly" id="hourly-forecast-list">
+            <!-- Dynamically populated hourly scroll list -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Right / Side Panel -->
+      <aside class="side-panel">
+        
+        <!-- 7-Day Forecast -->
+        <div class="card glass-card daily-forecast-card">
+          <div class="card-header">
+            <h3><i data-lucide="calendar-days"></i> 7-Day Forecast</h3>
+          </div>
+          <div class="card-body">
+            <ul class="daily-forecast-list" id="daily-forecast-list">
+              <!-- Dynamically populated daily list -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Starred Locations / Watchlist -->
+        <div class="card glass-card favorites-card">
+          <div class="card-header">
+            <h3><i data-lucide="star" class="starred-header-icon"></i> Watchlist</h3>
+          </div>
+          <div class="card-body">
+            <div class="favorites-container" id="favorites-list">
+              <!-- Dynamically populated favorite cards -->
+              <div class="favorites-placeholder">
+                <i data-lucide="info" class="placeholder-icon"></i>
+                <p>Star cities to save them to your watchlist for quick access.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Data provided by Open-Meteo API. Built for visual excellence & performance.</p>
+      <p class="copyright">&copy; 2026 ApexSky. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
